@@ -1,5 +1,5 @@
 node_modules
-android/app
+android/app/build
 ios/Pods
 ios/Podfile.lock
 .gradle
