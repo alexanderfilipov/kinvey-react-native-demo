@@ -7,9 +7,12 @@
  */
 
 import React, {Component, PureComponent} from 'react';
-import {StyleSheet, Text, View, FlatList, Button, Linking} from 'react-native';
-import {AuthorizationGrant, DataStore, DataStoreType, User} from 'kinvey-react-native-sdk';
+import {StyleSheet, Text, View, FlatList, Button, Linking, Image} from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
+import {AuthorizationGrant, DataStore, DataStoreType, User, Files} from 'kinvey-react-native-sdk';
 import {register, unregister} from 'kinvey-react-native-sdk/lib/push';
+import { Buffer } from 'buffer';
 
 class BookListItem extends PureComponent {
   render() {
@@ -24,7 +27,7 @@ class BookListItem extends PureComponent {
 type Props = {};
 
 export default class App extends Component<Props> {
-  state = { books: [] };
+  state = { books: [], image: null };
 
   _keyExtractor = (item, index) => item._id;
 
@@ -99,6 +102,35 @@ export default class App extends Component<Props> {
     console.log('user logged out');
   }
 
+  async uploadFile() {
+    try {
+      const selectedFiles = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
+      });
+      const metadata = selectedFiles[0];
+      metadata.public = true;
+      metadata.filename = metadata.name;
+      metadata.mimeType = metadata.type;
+
+      const fileContent = await RNFS.readFile(metadata.uri, 'base64');
+      const buff = Buffer.from(fileContent, 'base64');
+      await Files.upload(buff, metadata);
+
+      // display the image
+      const fileWithType = `data:image/jpeg;base64,${fileContent}`
+      this.setState({
+        image: fileWithType,
+      });
+    } catch (err) {
+      console.log(err + JSON.stringify(err));
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err
+      }
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -108,6 +140,7 @@ export default class App extends Component<Props> {
         <Button title="Register Push SDK" onPress={this.registerForPush} />
         <Button title="Hello" onPress={() => console.log('Hello world!')} />
         <Button title="Load collection" onPress={this.loadCollection} />
+        <Button title="Upload file" onPress={() => { this.uploadFile() }} />
         <Text>Data collection</Text>
         <FlatList
           data={this.state.books}
@@ -115,6 +148,7 @@ export default class App extends Component<Props> {
           renderItem={this._renderItem}
           style={styles.item}
         />
+        <Image style={{ width: 300, height: 150, margin: 20 }} source={{ uri: this.state.image }} />
       </View>
     );
   }

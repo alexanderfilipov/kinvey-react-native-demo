@@ -489,6 +489,7 @@
 				DEVELOPMENT_TEAM = Y9477LLDQV;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = KinveyDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -515,6 +516,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y9477LLDQV;
 				INFOPLIST_FILE = KinveyDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
